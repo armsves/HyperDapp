@@ -12,7 +12,7 @@ import {
 } from '@graphprotocol/hypergraph-react';
 import { useState } from 'react';
 
-import { Project } from '@/app/schema';
+import { Dapp } from '@/app/schema';
 import { Button } from '../ui/button';
 
 export function PrivateSpaceWrapper({ spaceid }: Readonly<{ spaceid: string }>) {
@@ -25,12 +25,15 @@ export function PrivateSpaceWrapper({ spaceid }: Readonly<{ spaceid: string }>) 
 
 function PrivateSpace() {
   const { name, ready, id: spaceId } = useSpace({ mode: 'private' });
-  const { data: projects } = useQuery(Project, { mode: 'private' });
+  const { data: dapps } = useQuery(Dapp, { mode: 'private' });
   const { data: publicSpaces } = useSpaces({ mode: 'public' });
   const [selectedSpace, setSelectedSpace] = useState<string>('');
-  const createProject = useCreateEntity(Project);
-  const [projectName, setProjectName] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
+  const createDapp = useCreateEntity(Dapp);
+  const [dappName, setDappName] = useState('');
+  const [dappDescription, setDappDescription] = useState('');
+  const [dappCategory, setDappCategory] = useState('');
+  const [dappContract, setDappContract] = useState('');
+  const [dappImageUrl, setDappImageUrl] = useState('');
   const { getSmartSessionClient } = useHypergraphApp();
 
   if (!ready) {
@@ -44,20 +47,35 @@ function PrivateSpace() {
     );
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    createProject({ name: projectName, description: projectDescription });
-    setProjectName('');
-    setProjectDescription('');
+    try {
+      await createDapp({
+        name: dappName,
+        description: dappDescription || undefined,
+        category: dappCategory || undefined,
+        contract: dappContract || undefined,
+        active: false,
+        image: dappImageUrl || undefined,
+      });
+      setDappName('');
+      setDappDescription('');
+      setDappCategory('');
+      setDappContract('');
+      setDappImageUrl('');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to create dApp');
+    }
   };
 
-  const publishToPublicSpace = async (project: Project) => {
+  const publishToPublicSpace = async (dapp: Dapp) => {
     if (!selectedSpace) {
       alert('No space selected');
       return;
     }
     try {
-      const { ops } = await preparePublish({ entity: project, publicSpace: selectedSpace });
+      const { ops } = await preparePublish({ entity: dapp, publicSpace: selectedSpace });
       const smartSessionClient = await getSmartSessionClient();
       if (!smartSessionClient) {
         throw new Error('Missing smartSessionClient');
@@ -65,14 +83,14 @@ function PrivateSpace() {
       const publishResult = await publishOps({
         ops,
         space: selectedSpace,
-        name: 'Publish Project',
+        name: 'Publish Dapp',
         walletClient: smartSessionClient,
       });
       console.log(publishResult, ops);
-      alert('Project published to public space');
+      alert('Dapp published to public space');
     } catch (error) {
       console.error(error);
-      alert('Error publishing project to public space');
+      alert('Error publishing dapp to public space');
     }
   };
 
@@ -84,71 +102,121 @@ function PrivateSpace() {
           <p className="text-slate-600 mt-1 text-sm">Private Space</p>
           <h1 className="text-3xl font-bold text-slate-900">{name}</h1>
           <p className="text-slate-600 mt-1 text-sm">ID: {spaceId}</p>
-          <p className="text-muted-foreground mt-6">Manage your private projects and publish them to public spaces</p>
+          <p className="text-muted-foreground mt-6">Manage your private dApps and publish them to public spaces</p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* Create Project Form */}
+          {/* Create Dapp Form */}
           <div className="space-y-6">
             <div className="bg-card border rounded-lg p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-card-foreground mb-4">Create New Project</h2>
+              <h2 className="text-xl font-semibold text-card-foreground mb-4">Create New dApp</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="project-name" className="text-sm font-medium text-card-foreground">
-                    Project Name
+                  <label htmlFor="dapp-name" className="text-sm font-medium text-card-foreground">
+                    dApp Name
                   </label>
                   <input
-                    id="project-name"
+                    id="dapp-name"
                     type="text"
-                    value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
-                    placeholder="Enter project name..."
+                    value={dappName}
+                    onChange={(e) => setDappName(e.target.value)}
+                    placeholder="Enter dApp name..."
                     className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="project-description" className="text-sm font-medium text-card-foreground">
-                    Project Description
+                  <label htmlFor="dapp-image" className="text-sm font-medium text-card-foreground">
+                    Image URL
                   </label>
                   <input
-                    id="project-description"
+                    id="dapp-image"
                     type="text"
-                    value={projectDescription}
-                    onChange={(e) => setProjectDescription(e.target.value)}
-                    placeholder="Enter project description..."
+                    value={dappImageUrl}
+                    onChange={(e) => setDappImageUrl(e.target.value)}
+                    placeholder="https://... or ipfs://..."
                     className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={!projectName.trim()}>
-                  Create Project
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="dapp-category" className="text-sm font-medium text-card-foreground">
+                      Category
+                    </label>
+                    <input
+                      id="dapp-category"
+                      type="text"
+                      value={dappCategory}
+                      onChange={(e) => setDappCategory(e.target.value)}
+                      placeholder="DeFi, Social, Tools..."
+                      className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="dapp-contract" className="text-sm font-medium text-card-foreground">
+                      Contract Address
+                    </label>
+                    <input
+                      id="dapp-contract"
+                      type="text"
+                      value={dappContract}
+                      onChange={(e) => setDappContract(e.target.value)}
+                      placeholder="0x..."
+                      className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent font-mono"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="dapp-description" className="text-sm font-medium text-card-foreground">
+                    Description
+                  </label>
+                  <textarea
+                    id="dapp-description"
+                    rows={3}
+                    value={dappDescription}
+                    onChange={(e) => setDappDescription(e.target.value)}
+                    placeholder="What does your dApp do?"
+                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={!dappName.trim()}>
+                  Create dApp
                 </Button>
               </form>
             </div>
           </div>
 
-          {/* Addresses List */}
+          {/* dApps List */}
           <div className="space-y-6">
             <div className="bg-card border rounded-lg p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-card-foreground mb-4">
-                Your Projects ({projects?.length || 0})
+                Your dApps ({dapps?.length || 0})
               </h2>
 
-              {projects && projects.length > 0 ? (
+              {dapps && dapps.length > 0 ? (
                 <div className="space-y-4">
-                  {projects.map((project) => (
-                    <div key={project.id} className="border border-border rounded-lg p-4 bg-background">
+                  {dapps.map((dapp) => (
+                    <div key={dapp.id} className="border border-border rounded-lg p-4 bg-background">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-medium text-foreground">{project.name}</h3>
+                        <h3 className="font-medium text-foreground">{dapp.name}</h3>
+                        {dapp.category && <span className="text-xs text-purple-600 font-semibold">{dapp.category}</span>}
                       </div>
 
                       <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs text-muted-foreground">ID: {project.id}</p>
+                        <p className="text-xs text-muted-foreground">ID: {dapp.id}</p>
                       </div>
 
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-sm text-muted-foreground">{project.description}</p>
-                      </div>
+                      {dapp.description && (
+                        <div className="flex items-center justify-between mb-3">
+                          <p className="text-sm text-muted-foreground">{dapp.description}</p>
+                        </div>
+                      )}
+
+                      {dapp.contract && (
+                        <div className="flex items-center justify-between mb-3">
+                          <p className="text-xs font-mono text-muted-foreground">{dapp.contract}</p>
+                        </div>
+                      )}
 
                       <div className="space-y-3">
                         <div className="space-y-2">
@@ -171,7 +239,7 @@ function PrivateSpace() {
                         </div>
 
                         <Button
-                          onClick={() => publishToPublicSpace(project)}
+                          onClick={() => publishToPublicSpace(dapp)}
                           disabled={!selectedSpace}
                           variant="outline"
                           size="sm"
@@ -200,8 +268,8 @@ function PrivateSpace() {
                       />
                     </svg>
                   </div>
-                  <p className="text-muted-foreground">No projects created yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">Create your first project using the form</p>
+                  <p className="text-muted-foreground">No dApps created yet</p>
+                  <p className="text-sm text-muted-foreground mt-1">Create your first dApp using the form</p>
                 </div>
               )}
             </div>
@@ -211,3 +279,4 @@ function PrivateSpace() {
     </div>
   );
 }
+

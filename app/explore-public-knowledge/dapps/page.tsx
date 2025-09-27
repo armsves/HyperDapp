@@ -9,7 +9,6 @@ export default function ExploreDappsPage() {
     mode: 'public',
     space: '3f32353d-3b27-4a13-b71a-746f06e1f7db',
     first: 100,
-    include: { image: {} },
   });
 
   return (
@@ -32,9 +31,9 @@ export default function ExploreDappsPage() {
 
             <div className="relative p-6">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-                {dapp.image?.[0]?.url ? (
+                {dapp.image ? (
                   <GraphImage
-                    src={dapp.image[0].url}
+                    src={dapp.image}
                     alt={`${dapp.name} avatar`}
                     className="w-full h-full object-cover"
                   />

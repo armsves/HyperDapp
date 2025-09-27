@@ -2,6 +2,7 @@
 
 import { useHypergraphApp, useHypergraphAuth } from '@graphprotocol/hypergraph-react';
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useLayoutEffect, useState } from 'react';
 
 import { SpacesMenu } from './SpacesMenu';
@@ -71,6 +72,8 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
     logout();
     navigation.push('/login');
   };
+  const isAdmin = (identity?.accountAddress || privyIdentity?.accountAddress || '').toLowerCase() ===
+    '0x141ea27023ceef7d45611889699849cb267d89ca';
 
   return (
     <div className="min-h-full flex flex-col">
@@ -79,54 +82,36 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
           <div className="flex h-16 items-center justify-between">
             <NavigationMenu viewport={false}>
               <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    href="/"
-                    className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
-                  >
-                    Home
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    href="/explore-public-knowledge"
-                    className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
-                  >
-                    Explore Public Knowledge
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+                
 
               <NavigationMenuItem>
                 <NavigationMenuLink
-                  href="/dapps"
+                  href="/public-space/745bd24c-3bf7-4e1d-b413-cffadddd0c61"
                   className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
                 >
                   dApps Showcase
                 </NavigationMenuLink>
               </NavigationMenuItem>
 
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>My Spaces</NavigationMenuTrigger>
-                  {authenticated ? (
-                    <SpacesMenu />
-                  ) : (
-                    <NavigationMenuContent>
-                      <div className="w-[240px] py-4 text-center text-muted-foreground">
-                        <p>
-                          Sign in to access your
-                          <br />
-                          private and public spaces
-                        </p>
-                      </div>
-                    </NavigationMenuContent>
-                  )}
-                </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  href="/private-space/c7967341-e422-4b1d-aa36-bfe8ee56aae1"
+                  className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
+                >
+                  Submit dApp
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+
               </NavigationMenuList>
             </NavigationMenu>
 
             {/* Auth Button */}
             <div className="flex items-center space-x-4">
+              {isAdmin && (
+                <Button asChild variant="outline">
+                  <Link href="/admin/dapps">Admin</Link>
+                </Button>
+              )}
               {walletAddress && (
                 <div
                   onClick={handleCopy}
@@ -146,9 +131,6 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
               ) : (
                 <Button onClick={handleSignIn}>Sign in with Geo Connect</Button>
               )}
-              <Button asChild>
-                <a href="/submit-dapp">Submit dApp</a>
-              </Button>
             </div>
           </div>
         </div>
