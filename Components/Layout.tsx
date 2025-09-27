@@ -2,7 +2,7 @@
 
 import { useHypergraphApp, useHypergraphAuth } from '@graphprotocol/hypergraph-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 import { SpacesMenu } from './SpacesMenu';
 import { Button } from './ui/button';
@@ -19,8 +19,21 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   const navigation = useRouter();
   const pathname = usePathname();
 
-  const { authenticated } = useHypergraphAuth();
+  const { authenticated, identity, privyIdentity } = useHypergraphAuth();
   const { redirectToConnect, logout } = useHypergraphApp();
+  const walletAddress = identity?.accountAddress || privyIdentity?.accountAddress || null;
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    if (!walletAddress) return;
+    try {
+      await navigator.clipboard.writeText(walletAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {
+      // ignore
+    }
+  };
 
   useLayoutEffect(() => {
     if (
@@ -32,7 +45,8 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
       pathname === '/explore-public-knowledge/dapps' ||
       pathname === '/explore-public-knowledge/investors' ||
       pathname === '/explore-public-knowledge/investment-rounds' ||
-      pathname === '/explore-public-knowledge/assets'
+      pathname === '/explore-public-knowledge/assets' ||
+      pathname === '/dapps'
     ) {
       return;
     }
@@ -83,6 +97,15 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
                   </NavigationMenuLink>
                 </NavigationMenuItem>
 
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  href="/dapps"
+                  className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
+                >
+                  dApps Showcase
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>My Spaces</NavigationMenuTrigger>
                   {authenticated ? (
@@ -104,6 +127,18 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
 
             {/* Auth Button */}
             <div className="flex items-center space-x-4">
+              {walletAddress && (
+                <div
+                  onClick={handleCopy}
+                  role="button"
+                  tabIndex={0}
+                  title={copied ? 'Copied!' : 'Click to copy'}
+                  className="hidden md:flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-mono bg-background/50 cursor-pointer hover:bg-accent/50"
+                >
+                  <span className="opacity-70">{copied ? 'Copied' : 'Wallet'}</span>
+                  <span>{`${walletAddress.slice(0, 6)}…${walletAddress.slice(-4)}`}</span>
+                </div>
+              )}
               {authenticated ? (
                 <Button onClick={handleLogout} variant="outline">
                   Logout
@@ -111,6 +146,9 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
               ) : (
                 <Button onClick={handleSignIn}>Sign in with Geo Connect</Button>
               )}
+              <Button asChild>
+                <a href="/submit-dapp">Submit dApp</a>
+              </Button>
             </div>
           </div>
         </div>

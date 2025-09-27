@@ -24,11 +24,15 @@ export const mapping: Mapping.Mapping = {
     properties: {
       name: Id('a126ca53-0c8e-48d5-b888-82c734c38935'),
       description: Id('9b1f76ff-9711-404c-861e-59dc3fa7d037'),
+      category: Id('ace1e96c-9b83-47b4-bd33-1d302ec0a0f5'),
+      contract: Id('56b5944f-f059-48d1-b0fa-34abe84219da'),
+      rating: Id('16781706-dd9c-48bf-913e-cdf18b56034f'),
+      active: Id('9a9b4f5e-3e4f-4d57-8a6a-1c2d3e4f5a6b'),
       xUrl: Id('0d625978-4b3c-4b57-a86f-de45c997c73c'),
       githubUrl: Id('9eedefa8-60ae-4ac1-9a04-805054a4b094'),
     },
     relations: {
-      avatar: Id('1155beff-fad5-49b7-a2e0-da4777b8792c'),
+      image: Id('1155beff-fad5-49b7-a2e0-da4777b8792c'),
     },
   },
   Investor: {

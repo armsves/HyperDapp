@@ -14,9 +14,14 @@ export class Project extends Entity.Class<Project>('Project')({
 export class Dapp extends Entity.Class<Dapp>('Dapp')({
   name: Type.String,
   description: Type.optional(Type.String),
+  category: Type.optional(Type.String),
+  contract: Type.optional(Type.String),
+  rating: Type.optional(Type.Number),
+  active: Type.optional(Type.Boolean),
+  image: Type.Relation(Image),
+  // legacy/optional links
   xUrl: Type.optional(Type.String),
   githubUrl: Type.optional(Type.String),
-  avatar: Type.Relation(Image),
 }) {}
 
 export class Investor extends Entity.Class<Investor>('Investor')({
