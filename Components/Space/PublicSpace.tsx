@@ -32,7 +32,14 @@ function PublicSpace() {
   const [votingDapp, setVotingDapp] = useState<Dapp | null>(null);
   const [isVoting, setIsVoting] = useState(false);
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [interactionInfo, setInteractionInfo] = useState(null);
+  const [interactionInfo, setInteractionInfo] = useState<{
+    contractAddress: string;
+    interactionCount: number;
+    votingWeight: number;
+    message: string;
+    isUniswapV4: boolean;
+    dataSource: string;
+  } | null>(null);
 
   // Initialize blockchain tracker on component mount
   useEffect(() => {
