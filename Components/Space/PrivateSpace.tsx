@@ -38,10 +38,10 @@ function PrivateSpace() {
 
   if (!ready) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-[#4B0082]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading space...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3D9BE9] mx-auto mb-4"></div>
+          <p className="text-[#F5F5F5]">Loading space...</p>
         </div>
       </div>
     );
@@ -95,24 +95,24 @@ function PrivateSpace() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#4B0082]">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <p className="text-slate-600 mt-1 text-sm">Private Space</p>
-          <h1 className="text-3xl font-bold text-slate-900">{name}</h1>
-          <p className="text-slate-600 mt-1 text-sm">ID: {spaceId}</p>
-          <p className="text-muted-foreground mt-6">Manage your private dApps and publish them to public spaces</p>
+          <p className="text-[#B0B0B0] mt-1 text-sm">Private Space</p>
+          <h1 className="text-3xl font-bold text-[#F5F5F5]">{name}</h1>
+          <p className="text-[#B0B0B0] mt-1 text-sm">ID: {spaceId}</p>
+          <p className="text-[#B0B0B0] mt-6">Manage your private dApps and publish them to public spaces</p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Create Dapp Form */}
           <div className="space-y-6">
-            <div className="bg-card border rounded-lg p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-card-foreground mb-4">Create New dApp</h2>
+            <div className="bg-[#1E1B2E] border border-[#3D9BE9]/20 rounded-lg p-6 shadow-sm">
+              <h2 className="text-xl font-semibold text-[#F5F5F5] mb-4">Create New dApp</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="dapp-name" className="text-sm font-medium text-card-foreground">
+                  <label htmlFor="dapp-name" className="text-sm font-medium text-[#F5F5F5]">
                     dApp Name
                   </label>
                   <input
@@ -121,12 +121,12 @@ function PrivateSpace() {
                     value={dappName}
                     onChange={(e) => setDappName(e.target.value)}
                     placeholder="Enter dApp name..."
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                    className="w-full px-3 py-2 border border-[#B0B0B0]/30 bg-[#4B0082]/20 text-[#F5F5F5] placeholder-[#B0B0B0] rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#3D9BE9] focus:border-[#3D9BE9]"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="dapp-image" className="text-sm font-medium text-card-foreground">
+                  <label htmlFor="dapp-image" className="text-sm font-medium text-[#F5F5F5]">
                     Image URL
                   </label>
                   <input
@@ -135,25 +135,31 @@ function PrivateSpace() {
                     value={dappImageUrl}
                     onChange={(e) => setDappImageUrl(e.target.value)}
                     placeholder="https://... or ipfs://..."
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                    className="w-full px-3 py-2 border border-[#B0B0B0]/30 bg-[#4B0082]/20 text-[#F5F5F5] placeholder-[#B0B0B0] rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#3D9BE9] focus:border-[#3D9BE9]"
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label htmlFor="dapp-category" className="text-sm font-medium text-card-foreground">
+                    <label htmlFor="dapp-category" className="text-sm font-medium text-[#F5F5F5]">
                       Category
                     </label>
-                    <input
+                    <select
                       id="dapp-category"
-                      type="text"
                       value={dappCategory}
                       onChange={(e) => setDappCategory(e.target.value)}
-                      placeholder="DeFi, Social, Tools..."
-                      className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-                    />
+                      className="w-full px-3 py-2 border border-[#B0B0B0]/30 bg-[#4B0082]/20 text-[#F5F5F5] rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#3D9BE9] focus:border-[#3D9BE9] [&>option]:bg-white [&>option]:text-black"
+                    >
+                      <option value="" className="bg-white text-black">Select a category...</option>
+                      <option value="DeFi" className="bg-white text-black">DeFi</option>
+                      <option value="Gaming" className="bg-white text-black">Gaming</option>
+                      <option value="Social" className="bg-white text-black">Social</option>
+                      <option value="Tools" className="bg-white text-black">Tools</option>
+                      <option value="NFT" className="bg-white text-black">NFT</option>
+                      <option value="Infrastructure" className="bg-white text-black">Infrastructure</option>
+                    </select>
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="dapp-contract" className="text-sm font-medium text-card-foreground">
+                    <label htmlFor="dapp-contract" className="text-sm font-medium text-[#F5F5F5]">
                       Contract Address
                     </label>
                     <input
@@ -162,12 +168,12 @@ function PrivateSpace() {
                       value={dappContract}
                       onChange={(e) => setDappContract(e.target.value)}
                       placeholder="0x..."
-                      className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent font-mono"
+                      className="w-full px-3 py-2 border border-[#B0B0B0]/30 bg-[#4B0082]/20 text-[#F5F5F5] placeholder-[#B0B0B0] rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#3D9BE9] focus:border-[#3D9BE9] font-mono"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="dapp-description" className="text-sm font-medium text-card-foreground">
+                  <label htmlFor="dapp-description" className="text-sm font-medium text-[#F5F5F5]">
                     Description
                   </label>
                   <textarea
@@ -176,84 +182,86 @@ function PrivateSpace() {
                     value={dappDescription}
                     onChange={(e) => setDappDescription(e.target.value)}
                     placeholder="What does your dApp do?"
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                    className="w-full px-3 py-2 border border-[#B0B0B0]/30 bg-[#4B0082]/20 text-[#F5F5F5] placeholder-[#B0B0B0] rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#3D9BE9] focus:border-[#3D9BE9] resize-none"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={!dappName.trim()}>
+                <button 
+                  type="submit" 
+                  disabled={!dappName.trim()}
+                  className="w-full px-4 py-2 rounded-md bg-gradient-to-r from-[#3D9BE9] to-[#E940A9] text-[#F5F5F5] hover:from-[#3D9BE9]/80 hover:to-[#E940A9]/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
+                >
                   Create dApp
-                </Button>
+                </button>
               </form>
             </div>
           </div>
 
           {/* dApps List */}
           <div className="space-y-6">
-            <div className="bg-card border rounded-lg p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-card-foreground mb-4">
+            <div className="bg-[#1E1B2E] border border-[#3D9BE9]/20 rounded-lg p-6 shadow-sm">
+              <h2 className="text-xl font-semibold text-[#F5F5F5] mb-4">
                 Your dApps ({dapps?.length || 0})
               </h2>
 
               {dapps && dapps.length > 0 ? (
                 <div className="space-y-4">
                   {dapps.map((dapp) => (
-                    <div key={dapp.id} className="border border-border rounded-lg p-4 bg-background">
+                    <div key={dapp.id} className="border border-[#3D9BE9]/20 rounded-lg p-4 bg-[#4B0082]/20">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-medium text-foreground">{dapp.name}</h3>
-                        {dapp.category && <span className="text-xs text-purple-600 font-semibold">{dapp.category}</span>}
+                        <h3 className="font-medium text-[#F5F5F5]">{dapp.name}</h3>
+                        {dapp.category && <span className="text-xs bg-[#E940A9]/20 text-[#E940A9] px-2 py-1 rounded-full font-semibold">{dapp.category}</span>}
                       </div>
 
                       <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs text-muted-foreground">ID: {dapp.id}</p>
+                        <p className="text-xs text-[#B0B0B0] font-mono">ID: {dapp.id}</p>
                       </div>
 
                       {dapp.description && (
                         <div className="flex items-center justify-between mb-3">
-                          <p className="text-sm text-muted-foreground">{dapp.description}</p>
+                          <p className="text-sm text-[#B0B0B0]">{dapp.description}</p>
                         </div>
                       )}
 
                       {dapp.contract && (
                         <div className="flex items-center justify-between mb-3">
-                          <p className="text-xs font-mono text-muted-foreground">{dapp.contract}</p>
+                          <p className="text-xs font-mono text-[#B0B0B0]">{dapp.contract}</p>
                         </div>
                       )}
 
                       <div className="space-y-3">
                         <div className="space-y-2">
-                          <label htmlFor="space" className="text-xs font-medium text-muted-foreground">
+                          <label htmlFor="space" className="text-xs font-medium text-[#B0B0B0]">
                             Select Public Space to Publish
                           </label>
                           <select
                             name="space"
                             value={selectedSpace}
                             onChange={(e) => setSelectedSpace(e.target.value)}
-                            className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                            className="w-full px-3 py-2 border border-[#B0B0B0]/30 bg-[#4B0082]/20 text-[#F5F5F5] rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#3D9BE9] focus:border-[#3D9BE9] [&>option]:bg-white [&>option]:text-black"
                           >
-                            <option value="">Choose a public space...</option>
+                            <option value="" className="bg-white text-black">Choose a public space...</option>
                             {publicSpaces?.map((space) => (
-                              <option key={space.id} value={space.id}>
+                              <option key={space.id} value={space.id} className="bg-white text-black">
                                 {space.name}
                               </option>
                             ))}
                           </select>
                         </div>
 
-                        <Button
+                        <button
                           onClick={() => publishToPublicSpace(dapp)}
                           disabled={!selectedSpace}
-                          variant="outline"
-                          size="sm"
-                          className="w-full"
+                          className="w-full px-3 py-2 rounded-md border border-[#3D9BE9] text-[#3D9BE9] hover:bg-[#3D9BE9]/20 hover:text-[#F5F5F5] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium"
                         >
                           Publish to Public Space
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <div className="text-muted-foreground mb-2">
+                  <div className="text-[#3D9BE9] mb-2">
                     <svg
                       className="mx-auto h-12 w-12 mb-4 opacity-50"
                       fill="none"
@@ -268,8 +276,8 @@ function PrivateSpace() {
                       />
                     </svg>
                   </div>
-                  <p className="text-muted-foreground">No dApps created yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">Create your first dApp using the form</p>
+                  <p className="text-[#F5F5F5]">No dApps created yet</p>
+                  <p className="text-sm text-[#B0B0B0] mt-1">Create your first dApp using the form</p>
                 </div>
               )}
             </div>

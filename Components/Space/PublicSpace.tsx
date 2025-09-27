@@ -30,6 +30,7 @@ function PublicSpace() {
   const updateDapp = useUpdateEntity(Dapp, { space: "c7967341-e422-4b1d-aa36-bfe8ee56aae1" });
   const [votingDapp, setVotingDapp] = useState<Dapp | null>(null);
   const [isVoting, setIsVoting] = useState(false);
+  const [hoveredRating, setHoveredRating] = useState(0);
 
   const handleVote = async (rating: number) => {
     if (!votingDapp || !ready || !spaceId) {
@@ -76,13 +77,14 @@ function PublicSpace() {
 
   const renderStars = (rating: number | undefined, interactive = false, onClick?: () => void) => {
     const stars = [];
-    const currentRating = rating || 0;
+    const currentRating = Math.round(rating || 0);
     for (let i = 1; i <= 5; i++) {
+      const isFilled = i <= currentRating;
       stars.push(
         <span
           key={i}
-          className={`${interactive ? 'cursor-pointer hover:text-yellow-400' : ''} ${
-            i <= currentRating ? 'text-yellow-500' : 'text-gray-300'
+          className={`text-base ${interactive ? 'cursor-pointer hover:text-[#4ADE80] hover:scale-110 transition-all' : ''} ${
+            isFilled ? 'text-[#4ADE80]' : 'text-[#B0B0B0]'
           }`}
           onClick={onClick}
         >
@@ -90,27 +92,27 @@ function PublicSpace() {
         </span>
       );
     }
-    return <div className="flex">{stars}</div>;
+    return <div className="flex gap-0.5">{stars}</div>;
   };
 
   if (!ready) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-[#4B0082] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
-          <p className="text-slate-600 text-lg">Loading space...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3D9BE9] mx-auto mb-4" />
+          <p className="text-[#F5F5F5] text-lg">Loading space...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen bg-[#4B0082]">
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Dapps Showcase</h1>
+            <h1 className="text-3xl font-bold text-[#F5F5F5]">Dapps Showcase</h1>
           </div>
         </div>
       </div>
@@ -123,47 +125,58 @@ function PublicSpace() {
           {dapps.map((dapp) => (
             <div
               key={(dapp as unknown as { id: string }).id}
-              className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200 transform hover:-translate-y-1 z-10"
+              className="group relative bg-[#1E1B2E] rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-[#3D9BE9]/20 hover:border-[#3D9BE9] transform hover:-translate-y-1 z-10"
             >
               {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#3D9BE9]/10 to-[#E940A9]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
               {/* Content */}
               <div className="relative p-6">
                 {/* Image, Category, Rating - Horizontal Line */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#3D9BE9] to-[#E940A9] rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
                     {dapp.image && isValidUrl(dapp.image) ? (
                       <Image src={dapp.image} alt={`${dapp.name} image`} width={48} height={48} className="w-full h-full object-cover rounded-xl" />
                     ) : (
-                      <span className="text-white font-bold text-lg">{dapp.name.charAt(0).toUpperCase()}</span>
+                      <span className="text-[#F5F5F5] font-bold text-lg">{dapp.name.charAt(0).toUpperCase()}</span>
                     )}
                   </div>
                   
                   <div className="flex-1 flex justify-center">
                     {dapp.category && (
-                      <span className="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full font-semibold">
+                      <span className="bg-[#E940A9]/20 text-[#E940A9] text-xs px-2 py-1 rounded-full font-semibold">
                         {dapp.category}
                       </span>
                     )}
                   </div>
                   
                   <div className="flex items-center">
-                    {renderStars(dapp.rating, true, () => setVotingDapp(dapp))}
+                    {renderStars(dapp.rating, false)}
+                    <button 
+                      onClick={() => setVotingDapp(dapp)}
+                      className="ml-2 text-xs text-[#3D9BE9] hover:text-[#F5F5F5] cursor-pointer transition-colors"
+                    >
+                      Rate
+                    </button>
+                    <span className="ml-2 text-xs text-[#B0B0B0]">({dapp.rating || 0})</span>
                   </div>
                 </div>
 
                 {/* Project name */}
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                <h3 className="text-xl font-bold text-[#F5F5F5] mb-2 group-hover:text-[#3D9BE9] transition-colors duration-300">
                   {dapp.name}
                 </h3>
 
-                Rating: <p className="text-sm text-gray-600 mb-2 line-clamp-2">{dapp.rating}</p>
-                <p className="text-sm text-gray-600 mb-2 line-clamp-2">{dapp.contract}</p>
+                <div className="text-sm text-[#B0B0B0] mb-2">
+                  Rating: <span className="text-[#F5F5F5]">{dapp.rating || 'Not rated'}</span>
+                </div>
+                {dapp.contract && (
+                  <p className="text-sm text-[#B0B0B0] mb-2 line-clamp-2 font-mono">{dapp.contract}</p>
+                )}
 
                 {/* Project description */}
                 {dapp.description && (
-                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">{dapp.description}</p>
+                  <p className="text-sm text-[#B0B0B0] mb-2 line-clamp-2">{dapp.description}</p>
                 )}
 
                 {/* Project xUrl */}
@@ -172,7 +185,7 @@ function PublicSpace() {
                     href={dapp.xUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200 flex items-center gap-1"
+                    className="text-sm text-[#3D9BE9] hover:text-[#F5F5F5] transition-colors duration-200 flex items-center gap-1"
                   >
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -183,7 +196,7 @@ function PublicSpace() {
               </div>
 
               {/* Decorative corner accent */}
-              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 opacity-10 group-hover:opacity-20 transition-opacity duration-300 transform rotate-45 translate-x-8 -translate-y-8" />
+              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-[#3D9BE9] to-[#E940A9] opacity-10 group-hover:opacity-20 transition-opacity duration-300 transform rotate-45 translate-x-8 -translate-y-8" />
             </div>
           ))}
         </div>
@@ -191,8 +204,8 @@ function PublicSpace() {
         {/* Empty state */}
         {isPending === false && dapps.length === 0 && (
           <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-24 h-24 bg-gradient-to-br from-[#3D9BE9]/20 to-[#E940A9]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-12 h-12 text-[#3D9BE9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -201,18 +214,18 @@ function PublicSpace() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No dapps Found</h3>
-            <p className="text-gray-500">There are currently no public dapps available to explore.</p>
+            <h3 className="text-xl font-semibold text-[#F5F5F5] mb-2">No dapps Found</h3>
+            <p className="text-[#B0B0B0]">There are currently no public dapps available to explore.</p>
           </div>
         )}
       </div>
 
       {/* Voting Modal */}
       {votingDapp && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
-            <h3 className="text-xl font-bold mb-4 text-center">Rate {votingDapp.name}</h3>
-            <p className="text-gray-600 text-center mb-6">
+        <div className="fixed inset-0 bg-[#4B0082]/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#1E1B2E] border border-[#3D9BE9]/30 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <h3 className="text-xl font-bold mb-4 text-center text-[#F5F5F5]">Rate {votingDapp.name}</h3>
+            <p className="text-[#B0B0B0] text-center mb-6">
               Current rating: {votingDapp.rating ? `${votingDapp.rating}/5` : 'Not rated'}
             </p>
             
@@ -222,7 +235,11 @@ function PublicSpace() {
                   key={rating}
                   onClick={() => handleVote(rating)}
                   disabled={isVoting}
-                  className="text-3xl hover:text-yellow-400 transition-colors disabled:opacity-50 text-gray-300 hover:scale-110 transform"
+                  className={`text-3xl transition-colors disabled:opacity-50 hover:scale-110 transform ${
+                    rating <= (hoveredRating || 0) ? 'text-[#4ADE80]' : 'text-[#B0B0B0]'
+                  } hover:text-[#4ADE80]`}
+                  onMouseEnter={() => setHoveredRating(rating)}
+                  onMouseLeave={() => setHoveredRating(0)}
                 >
                   ★
                 </button>
@@ -233,7 +250,7 @@ function PublicSpace() {
               <button
                 onClick={() => setVotingDapp(null)}
                 disabled={isVoting}
-                className="flex-1 py-2 px-4 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                className="flex-1 py-2 px-4 rounded-md border border-[#B0B0B0]/30 text-[#B0B0B0] hover:bg-[#3D9BE9]/10 hover:text-[#F5F5F5] disabled:opacity-50 transition-colors"
               >
                 Cancel
               </button>
