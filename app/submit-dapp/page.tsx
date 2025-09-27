@@ -109,12 +109,80 @@ export default function SubmitDappPage() {
     }
   };
 
+  // Create sample Uniswap V4 dApp for testing
+  const createSampleDapp = async () => {
+    if (!selectedSourceSpace) {
+      alert('Please select a source space first');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setStatus('Creating sample Uniswap V4 dApp...');
+
+      const sampleDapp = {
+        name: 'Uniswap V4',
+        description: 'The next generation of Uniswap with enhanced features and improved efficiency',
+        category: 'DeFi',
+        contract: '0x000000000022D473030F116dDEE9F6B43aC78BA3', // Uniswap V4 Permit2
+        image: 'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984/logo.png',
+        rating: 0,
+        active: false, // Will need admin approval
+        xUrl: 'https://x.com/Uniswap',
+        githubUrl: 'https://github.com/Uniswap'
+      };
+
+      // Create the dApp entity in the private space
+      const dappEntity = await createDapp(sampleDapp);
+      console.log('Created dApp entity:', dappEntity);
+
+      // Publish to public space
+      const { ops } = await preparePublish({ entity: dappEntity, publicSpace: SPACE_ID });
+      console.log('Prepared ops for publishing:', ops);
+
+      const smartSessionClient = await getSmartSessionClient();
+      if (!smartSessionClient) {
+        throw new Error('Missing smartSessionClient');
+      }
+
+      const publishResult = await publishOps({
+        ops,
+        space: SPACE_ID,
+        name: 'Submit Uniswap V4 dApp',
+        walletClient: smartSessionClient,
+      });
+      console.log('Published to public space:', publishResult);
+
+      setStatus('✅ Sample Uniswap V4 dApp created successfully! It will appear in the admin panel for approval.');
+    } catch (error) {
+      console.error('Failed to create sample dApp:', error);
+      setStatus('❌ Failed to create sample dApp. Check console for details.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto py-10">
       <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
         Submit a dApp
       </h1>
       <p className="text-center text-muted-foreground mb-6">1) Choose a private source space 2) Submit dApp → it will be published to public space {SPACE_ID}.</p>
+
+      {/* Sample dApp Button */}
+      <div className="bg-[#1E1B2E] border border-[#3D9BE9]/30 rounded-xl p-4 mb-6">
+        <h3 className="text-lg font-semibold text-[#F5F5F5] mb-2">Test Blockchain Tracking</h3>
+        <p className="text-[#B0B0B0] text-sm mb-4">
+          Create a sample Uniswap V4 dApp to test the blockchain interaction tracking system.
+        </p>
+        <button
+          onClick={createSampleDapp}
+          disabled={isSubmitting || !selectedSourceSpace}
+          className="w-full py-2 px-4 rounded-md bg-gradient-to-r from-[#3D9BE9] to-[#E940A9] text-[#F5F5F5] hover:from-[#3D9BE9]/80 hover:to-[#E940A9]/80 disabled:opacity-60 transition-all font-medium"
+        >
+          {isSubmitting ? 'Creating...' : 'Create Sample Uniswap V4 dApp'}
+        </button>
+      </div>
 
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 mb-6">
         <label className="block text-sm font-medium mb-1">Select your private source space</label>

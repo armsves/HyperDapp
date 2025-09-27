@@ -2,9 +2,10 @@
 
 import { HypergraphSpaceProvider, useQuery, useSpace, useUpdateEntity, preparePublish, publishOps, useHypergraphApp } from '@graphprotocol/hypergraph-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Dapp } from '@/app/schema';
+import { blockchainTracker } from '@/lib/blockchain-tracker';
 
 function isValidUrl(string: string): boolean {
   try {
@@ -31,6 +32,30 @@ function PublicSpace() {
   const [votingDapp, setVotingDapp] = useState<Dapp | null>(null);
   const [isVoting, setIsVoting] = useState(false);
   const [hoveredRating, setHoveredRating] = useState(0);
+  const [interactionInfo, setInteractionInfo] = useState(null);
+
+  // Initialize blockchain tracker on component mount
+  useEffect(() => {
+    const initializeTracker = async () => {
+      try {
+        await blockchainTracker.initialize(null); // No provider needed for Substreams
+        console.log('Blockchain tracker initialized');
+      } catch (error) {
+        console.error('Failed to initialize blockchain tracker:', error);
+      }
+    };
+
+    initializeTracker();
+  }, []);
+
+  // Open voting modal with interaction info
+  const openVotingModal = (dapp: Dapp) => {
+    if (dapp.contract) {
+      const info = blockchainTracker.getInteractionInfo(dapp.contract);
+      setInteractionInfo(info);
+    }
+    setVotingDapp(dapp);
+  };
 
   const handleVote = async (rating: number) => {
     if (!votingDapp || !ready || !spaceId) {
@@ -40,10 +65,20 @@ function PublicSpace() {
     setIsVoting(true);
     try {
       const dappId = (votingDapp as unknown as { id: string }).id;
-      console.log('Updating dapp:', dappId, 'in private space with rating:', rating);
+      
+      // Apply voting weight if interaction info is available
+      let finalRating = rating;
+      if (interactionInfo && interactionInfo.votingWeight > 1) {
+        // For demonstration, we'll store the weighted rating
+        // In a real implementation, this would be handled by the backend
+        finalRating = Math.min(5, rating * interactionInfo.votingWeight);
+        console.log(`Applied voting weight ${interactionInfo.votingWeight}x: ${rating} -> ${finalRating}`);
+      }
+      
+      console.log('Updating dapp:', dappId, 'in private space with rating:', finalRating);
       
       // Step 1: Update the entity in the private space
-      const updatedEntity = await updateDapp(dappId, { rating });
+      const updatedEntity = await updateDapp(dappId, { rating: finalRating });
       console.log('Updated entity:', updatedEntity);
       
       // Step 2: Prepare the updated entity for publishing
@@ -65,8 +100,14 @@ function PublicSpace() {
       });
       console.log('Published to public space:', publishResult);
       
+      // Track the interaction
+      if (votingDapp.contract) {
+        blockchainTracker.trackInteraction(votingDapp.contract);
+      }
+      
       await refetch();
       setVotingDapp(null);
+      setInteractionInfo(null);
     } catch (err) {
       console.error('Failed to update rating:', err);
       alert('Failed to update rating. Check console for details.');
@@ -153,7 +194,7 @@ function PublicSpace() {
                   <div className="flex items-center">
                     {renderStars(dapp.rating, false)}
                     <button 
-                      onClick={() => setVotingDapp(dapp)}
+                      onClick={() => openVotingModal(dapp)}
                       className="ml-2 text-xs text-[#3D9BE9] hover:text-[#F5F5F5] cursor-pointer transition-colors"
                     >
                       Rate
@@ -225,9 +266,37 @@ function PublicSpace() {
         <div className="fixed inset-0 bg-[#4B0082]/80 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-[#1E1B2E] border border-[#3D9BE9]/30 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
             <h3 className="text-xl font-bold mb-4 text-center text-[#F5F5F5]">Rate {votingDapp.name}</h3>
-            <p className="text-[#B0B0B0] text-center mb-6">
+            <p className="text-[#B0B0B0] text-center mb-4">
               Current rating: {votingDapp.rating ? `${votingDapp.rating}/5` : 'Not rated'}
             </p>
+            
+            {/* Interaction Info */}
+            {interactionInfo && (
+              <div className="bg-[#4B0082]/20 border border-[#3D9BE9]/30 rounded-lg p-4 mb-6">
+                <div className="text-center">
+                  <div className="text-sm text-[#3D9BE9] font-semibold mb-2">
+                    Your Interaction History
+                  </div>
+                  <div className="text-[#F5F5F5] text-lg font-bold mb-1">
+                    {interactionInfo.interactionCount} interactions
+                  </div>
+                  <div className="text-[#B0B0B0] text-sm mb-2">
+                    {interactionInfo.message}
+                  </div>
+                  <div className="text-[#4ADE80] text-sm font-semibold">
+                    Voting Weight: {interactionInfo.votingWeight}x
+                  </div>
+                  {interactionInfo.isUniswapV4 && (
+                    <div className="text-[#E940A9] text-xs mt-2 font-semibold">
+                      ✓ Uniswap V4 Permit2 Contract Detected
+                    </div>
+                  )}
+                  <div className="text-[#B0B0B0] text-xs mt-1">
+                    Data source: {interactionInfo.dataSource}
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div className="flex justify-center gap-2 mb-6">
               {[1, 2, 3, 4, 5].map((rating) => (
