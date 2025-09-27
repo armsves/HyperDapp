@@ -96,14 +96,7 @@ function PrivateSpace() {
 
   return (
     <div className="min-h-screen bg-[#4B0082]">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Header */}
-        <div className="mb-8">
-          <p className="text-[#B0B0B0] mt-1 text-sm">Private Space</p>
-          <h1 className="text-3xl font-bold text-[#F5F5F5]">{name}</h1>
-          <p className="text-[#B0B0B0] mt-1 text-sm">ID: {spaceId}</p>
-          <p className="text-[#B0B0B0] mt-6">Manage your private dApps and publish them to public spaces</p>
-        </div>
+      <div className="container mx-auto px-4 py-4 max-w-4xl">
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Create Dapp Form */}
