@@ -37,7 +37,7 @@ export default function AdminDappsPage() {
     try {
       const dappId = (dapp as unknown as { id: string }).id;
       setSavingId(dappId);
-      await updateDapp({ id: dappId, active: !dapp.active });
+      await updateDapp(dappId, { active: !dapp.active });
       await refetch();
     } finally {
       setSavingId(null);
