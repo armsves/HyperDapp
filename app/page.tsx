@@ -158,8 +158,8 @@ export default function HomePage() {
             Ready to Shape the Future?
           </h2>
           <p className="text-lg text-[#B0B0B0] mb-8 max-w-2xl mx-auto">
-            Join the HyperDapp ecosystem today. Whether you're a developer, user, or enthusiast, 
-            there's a place for you in the decentralized future.
+            Join the HyperDapp ecosystem today. Whether you&apos;re a developer, user, or enthusiast, 
+            there&apos;s a place for you in the decentralized future.
           </p>
           
           {!authenticated && (
